@@ -27,18 +27,15 @@ async def validate_jwt(authorization: str = Depends(security)):
     collection_id=USER_COLLECTION_ID
   )
 
-  # print(documents)
-  # print(documents["documents"][0]["userId"])
-
   userId = documents["documents"][0]["userId"]
   currency = documents["documents"][0]["currency"]
   return [userId, currency]
 
 @router.post("/")
 async def forecast(requests: Union[List[Transactions_ing], List[Transactions_revolut], List[Transactions_shinha]], user: list = Depends(validate_jwt)):
-
-  # print(dict(requests[0]))
   
-  data = TransactionDao().save(data=requests, user_data=user)
+  # data = TransactionDao().save(data=requests, user_data=user)
+
+  print(requests[0])
 
 

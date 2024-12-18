@@ -14,15 +14,15 @@ def get_insert_data(requests: Union[List[Transactions_ing], List[Transactions_re
         # print(request_dict)
         request_data = {
            "id": secrets.token_hex(8),
-           "user_id": user_data[0],
+           "userId": user_data[0],
            "date": date_transform(request_dict["date"], "Ing"),
            "recipient": request_dict["name"],
            "currency": int(user_data[1]),
            "amount": amount_transform(request_dict["amount"], request_dict["debit_credit"], "Ing"),
-           "transaction_type": request_dict["transaction_type"],
-           "transaction_details": request_dict["notification"],
+           "transactionType": request_dict["transaction_type"],
+           "transactionDetails": request_dict["notification"],
            "icon": 0,
-           "user_currency": int(user_data[1]),
+           "userCurrency": int(user_data[1]),
            "balance": str(request_dict["balance"])
         }
         data.append(request_data)
@@ -31,15 +31,15 @@ def get_insert_data(requests: Union[List[Transactions_ing], List[Transactions_re
         # print(request_dict)
         request_data = {
            "id": secrets.token_hex(8),
-           "user_id": user_data[0],
+           "userId": user_data[0],
            "date": date_transform(request_dict["start_date"], "Revolut"),
            "recipient": request_dict["description"],
            "currency": get_currency(request_dict["currency"]),
            "amount": str(request_dict["amount"]),
-           "transaction_type": request_dict["type"],
-           "transaction_details": request_dict["description"],
+           "transactionType": request_dict["type"],
+           "transactionDetails": request_dict["description"],
            "icon": 0,
-           "user_currency": int(user_data[1]),
+           "userCurrency": int(user_data[1]),
            "balance": str(request_dict["balance"])
         }
         data.append(request_data)
@@ -49,15 +49,15 @@ def get_insert_data(requests: Union[List[Transactions_ing], List[Transactions_re
         if is_valid_date(request_dict["date"]):
           request_data = {
             "id": secrets.token_hex(8),
-            "user_id": user_data[0],
+            "userId": user_data[0],
             "date": request_dict["date"],
             "recipient": request_dict["recipient"],
             "currency": int(user_data[1]),
             "amount": amount_transform(request_dict["withdrawal"], request_dict["deposit"], "Shinha"),
-            "transaction_type": request_dict["transaction_place"],
-            "transaction_details": request_dict["description"],
+            "transactionType": request_dict["transaction_place"],
+            "transactionDetails": request_dict["description"],
             "icon": 0,
-            "user_currency": int(user_data[1]),
+            "userCurrency": int(user_data[1]),
             "balance": str(request_dict["balance"])
           }
           data.append(request_data)
@@ -69,15 +69,15 @@ def get_insert_data(requests: Union[List[Transactions_ing], List[Transactions_re
 
 class Transactions(BaseModel):
   id: str
-  user_id: str
+  userId: str
   date: str
   recipient: str
   currency: int
   amount: str
-  transaction_type: str
-  transaction_details: str
+  transactionType: str
+  transactionDetails: str
   icon: int
-  user_currency: int
+  userCurrency: int
   balance: str
 
 class TransactionResponse(BaseModel):

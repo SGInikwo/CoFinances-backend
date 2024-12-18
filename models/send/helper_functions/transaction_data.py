@@ -45,6 +45,6 @@ def is_valid_date(date_string: str) -> bool:
         return False
     
 def get_currency(data):
-  currency = {"Euros": 1, "Won": 2, "KES": 3, "GBP":4}
+  currency = {"EUR": 0, "KRW": 1, "KES": 2, "GBP": 3,  "GBP": 4}
 
   return currency[data]
