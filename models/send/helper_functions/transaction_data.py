@@ -19,20 +19,40 @@ def date_transform(date, type):
     date = parsed_date.strftime("%Y-%m-%d")
     return date
 
-def amount_transform(amount_plus, min_credit, type):
-  if type == "Shinha":
+def amount_transform(amount_plus, min_credit, bank):
+  if bank == "Shinha":
     if amount_plus == 0 or amount_plus == None:
       amount = f"-{min_credit}"
       return amount
     else:
       return f"{amount_plus}"
   
-  if type == "Ing":
+  if bank == "Revolut":
+    amount_plus = float(amount_plus)
+    amount_plus = f"{amount_plus:.2f}"
+    if ',' in amount_plus:
+      amount_plus = amount_plus.replace(',', '.')
+      return amount_plus
+    return amount_plus
+  
+  if bank == "Ing":
+    amount_plus = float(amount_plus)
+    amount_plus = f"{amount_plus / 100:.2f}"
+    if ',' in amount_plus:
+      amount_plus = amount_plus.replace(',', '.')
     if min_credit == "credit":
       amount = f"-{min_credit}"
       return amount
     else:
       return f"{amount_plus}"
+    
+def balance_transform(balance:str):
+  if balance == None or balance == "" or balance == "None":
+    return "0"
+  elif ',' in balance:
+    return balance.replace(',', '.')
+  else:
+    return balance
   
 
 def is_valid_date(date_string: str) -> bool:
