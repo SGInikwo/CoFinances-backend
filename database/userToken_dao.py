@@ -16,7 +16,7 @@ class UserToken:
     self.collection_id = USERTOKEN_COLLECTION_ID
 
 
-  def get_jwts(self, user_data):
+  def get_jwts(self):
     result = db.list_documents(
       database_id = self.db_id,
       collection_id = self.collection_id

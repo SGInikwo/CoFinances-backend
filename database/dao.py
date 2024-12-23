@@ -2,6 +2,7 @@ from database.deps import createAdminClient, DATABASE_ID, TRANSACTION_COLLECTION
 from appwrite.services.databases import Databases
 from appwrite.permission import Permission
 from appwrite.role import Role
+from appwrite.query import Query
 from models.receive.transactions import Transactions_ing, Transactions_revolut, Transactions_shinha
 import secrets
 
@@ -19,7 +20,10 @@ class TransactionDao:
   def get_transactions(self, user_data):
     result = db.list_documents(
       database_id = self.db_id,
-      collection_id = self.collection_id
+      collection_id = self.collection_id,
+      queries=[
+                Query.order_desc("date"),  # Sort by "name" in ascending order
+            ]
     )
 
     for rsul in result["documents"]:
