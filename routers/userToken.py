@@ -4,7 +4,7 @@ from models.send.transactions import TransactionResponse
 from models.receive.transactions import Transactions_ing, Transactions_revolut, Transactions_shinha
 import httpx
 from database.deps import createSessionClient, DATABASE_ID, TRANSACTION_COLLECTION_ID, ENDPOINT, PROJECT_ID, USER_COLLECTION_ID
-from database.userToken_dao import UserToken
+from database.userToken_dao import UserTokenDao
 from fastapi.security import HTTPBearer
 from appwrite.services.databases import Databases
 
@@ -18,7 +18,7 @@ security = HTTPBearer()
 
 async def validate_jwt(authorization: str = Depends(security)):
   token = authorization.credentials  # Extract the token from the Authorization header
-  print(token)
+  # print(token)
   db = createSessionClient().set_jwt(token)
 
   databases = Databases(db)
@@ -35,27 +35,27 @@ async def validate_jwt(authorization: str = Depends(security)):
 @router.post("/")
 async def forecast(user: list = Depends(validate_jwt)):
   
-  response = UserToken().save(user_data=user)
+  response = UserTokenDao().save(user_data=user)
 
   return response
 
 @router.post("/updateauth/")
 async def forecast(user: list = Depends(validate_jwt)):
   
-  response = UserToken().update(user_data=user)
+  response = UserTokenDao().update(user_data=user)
 
   return response
 
 @router.delete("/{user_id}")
 async def forecast(user_id: str):
   
-  response = UserToken().get_jwt(user_data=user_id)
+  response = UserTokenDao().get_jwt(user_data=user_id)
 
   return response
 
 @router.get("/{user_id}")
 async def forecast(user_id: str):
   
-  response = UserToken().get_jwt(user_data=user_id)
+  response = UserTokenDao().get_jwt(user_data=user_id)
 
   return response

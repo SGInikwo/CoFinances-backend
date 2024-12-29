@@ -4,7 +4,7 @@ from models.send.transactions import TransactionResponse
 from models.receive.transactions import Transactions_ing, Transactions_revolut, Transactions_shinha
 import httpx
 from database.deps import createSessionClient, DATABASE_ID, TRANSACTION_COLLECTION_ID, ENDPOINT, PROJECT_ID, USER_COLLECTION_ID
-from database.currency_dao import Currency
+from database.currency_dao import CurrencyDao
 from fastapi.security import HTTPBearer
 from appwrite.services.databases import Databases
 
@@ -18,7 +18,7 @@ security = HTTPBearer()
 
 async def validate_jwt(authorization: str = Depends(security)):
   token = authorization.credentials  # Extract the token from the Authorization header
-  print(token)
+  # print(token)
   db = createSessionClient().set_jwt(token)
 
   databases = Databases(db)
@@ -42,6 +42,6 @@ async def validate_jwt(authorization: str = Depends(security)):
 @router.get("/{base}-{target}")
 async def forecast(base: float, target: float):
   
-  response = Currency().get_currency(user_data=[base, target])
+  response = CurrencyDao().get_currency(user_data=[base, target])
 
   return response

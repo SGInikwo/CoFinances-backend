@@ -10,7 +10,7 @@ from models.send.userToken import get_insert_data
 client = createAdminClient()
 db = Databases(client)
 
-class UserToken:
+class UserTokenDao:
   def __init__(self):
     self.db_id = DATABASE_ID
     self.collection_id = USERTOKEN_COLLECTION_ID

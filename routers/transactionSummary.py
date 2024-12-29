@@ -4,13 +4,13 @@ from models.send.transactions import TransactionResponse
 from models.receive.transactions import Transactions_ing, Transactions_revolut, Transactions_shinha
 import httpx
 from database.deps import createSessionClient, DATABASE_ID, TRANSACTION_COLLECTION_ID, ENDPOINT, PROJECT_ID, USER_COLLECTION_ID
-from database.transaction_dao import TransactionDao
+from database.transactionSummary_dao import SummaryDao
 from fastapi.security import HTTPBearer
 from appwrite.services.databases import Databases
 
 router = APIRouter(
-  prefix="/transactions",
-  tags=["transaction"]
+  prefix="/summary",
+  tags=["summary"]
 )
 
 security = HTTPBearer()
@@ -32,17 +32,15 @@ async def validate_jwt(authorization: str = Depends(security)):
   return [userId, currency]
 
 @router.post("/", status_code=200)
-async def forecast(requests: Union[List[Transactions_ing], List[Transactions_revolut], List[Transactions_shinha]], user: list = Depends(validate_jwt)):
+async def forecast(user: list = Depends(validate_jwt)):
   
-  TransactionDao().save(data=requests, user_data=user)
+  SummaryDao().push_data(user_data=user)
 
   return "OK"
 
-@router.get("/list")
+@router.get("/summary", status_code=200)
 async def forecast(user: list = Depends(validate_jwt)):
   
-  response = TransactionDao().get_transactions(user_data=user)
+  summary = SummaryDao().get_custom_summary()
 
-  return response
-
-
+  return summary

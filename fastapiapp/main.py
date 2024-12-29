@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from routers import transaction, userToken, currency
+from routers import transaction, userToken, currency, transactionSummary
 
 load_dotenv()
 
@@ -24,3 +24,4 @@ app.add_middleware(
 app.include_router(transaction.router, prefix="/api")
 app.include_router(userToken.router, prefix="/api")
 app.include_router(currency.router, prefix="/api")
+app.include_router(transactionSummary.router, prefix="/api")

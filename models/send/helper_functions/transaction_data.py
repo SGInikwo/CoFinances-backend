@@ -19,41 +19,53 @@ def date_transform(date, type):
     date = parsed_date.strftime("%Y-%m-%d")
     return date
 
-def amount_transform(amount_plus, min_credit, bank):
+def amount_transform(withdraw, deposit_or, bank):
   if bank == "Shinha":
-    if amount_plus == 0 or amount_plus == None:
-      amount = f"-{min_credit}"
+    if withdraw != 0 or withdraw != None:
+      amount = f"-{withdraw}"
       return amount
     else:
-      return f"{amount_plus}"
+      return f"-{deposit_or}"
   
   if bank == "Revolut":
-    amount_plus = float(amount_plus)
-    amount_plus = f"{amount_plus:.2f}"
-    if ',' in amount_plus:
-      amount_plus = amount_plus.replace(',', '.')
-      return amount_plus
-    return amount_plus
+    amount = float(withdraw)
+    amount = f"{amount:.2f}"
+    if ',' in amount:
+      amount = amount.replace(',', '.')
+      return amount
+    return amount
   
   if bank == "Ing":
-    amount_plus = float(amount_plus)
-    amount_plus = f"{amount_plus / 100:.2f}"
-    if ',' in amount_plus:
-      amount_plus = amount_plus.replace(',', '.')
-    if min_credit == "credit":
-      amount = f"-{min_credit}"
+    withdraw = float(withdraw)
+    withdraw = f"{withdraw / 100:.2f}"
+    if ',' in withdraw:
+      withdraw = withdraw.replace(',', '.')
+    if deposit_or == "Debit":
+      amount = f"-{withdraw}"
       return amount
     else:
-      return f"{amount_plus}"
+      return f"{withdraw}"
     
-def balance_transform(balance:str):
+def balance_transform(balance, bank):
   if balance == None or balance == "" or balance == "None":
     return "0"
-  elif ',' in balance:
-    return balance.replace(',', '.')
-  else:
+  if bank == "Shinha":
     return balance
   
+  if bank == "Revolut":
+    balance = float(balance)
+    balance = f"{balance:.2f}"
+    if ',' in balance:
+      balance = balance.replace(',', '.')
+      return balance
+    return balance
+  
+  if bank == "Ing":
+    balance = float(balance)
+    balance = f"{balance / 100:.2f}"
+    if ',' in balance:
+      balance = balance.replace(',', '.')
+    return balance
 
 def is_valid_date(date_string: str) -> bool:
     try:

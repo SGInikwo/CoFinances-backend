@@ -11,7 +11,7 @@ from models.send.userToken import get_insert_data
 client = createAdminClient()
 db = Databases(client)
 
-class Currency:
+class CurrencyDao:
   def __init__(self):
     self.db_id = DATABASE_ID
     self.collection_id = CURRENCY_COLLECTION_ID

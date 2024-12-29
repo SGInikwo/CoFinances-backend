@@ -9,7 +9,6 @@ def get_insert_data(requests: Union[List[Transactions_ing], List[Transactions_re
   data = []
   for request in requests:
     request_dict = dict(request)
-
     if isinstance(request, Transactions_ing):
         request_data = {
            "id": secrets.token_hex(8),
@@ -22,7 +21,7 @@ def get_insert_data(requests: Union[List[Transactions_ing], List[Transactions_re
            "transactionDetails": request_dict["notification"],
            "icon": 0,
            "userCurrency": int(user_data[1]),
-           "balance": balance_transform(str(request_dict["balance"]))
+           "balance": balance_transform(request_dict["balance"], "Ing")
         }
         data.append(request_data)
     elif isinstance(request, Transactions_revolut):
@@ -37,7 +36,7 @@ def get_insert_data(requests: Union[List[Transactions_ing], List[Transactions_re
            "transactionDetails": request_dict["description"],
            "icon": 0,
            "userCurrency": int(user_data[1]),
-           "balance": balance_transform(str(request_dict["balance"]))
+           "balance": balance_transform(request_dict["balance"], "Revolut")
         }
         data.append(request_data)
     elif isinstance(request, Transactions_shinha):
@@ -53,7 +52,7 @@ def get_insert_data(requests: Union[List[Transactions_ing], List[Transactions_re
             "transactionDetails": request_dict["description"],
             "icon": 0,
             "userCurrency": int(user_data[1]),
-            "balance": balance_transform(str(request_dict["balance"]))
+            "balance": balance_transform(request_dict["balance"], "Shinha")
           }
           data.append(request_data)
     else:
