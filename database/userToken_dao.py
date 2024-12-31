@@ -55,7 +55,7 @@ class UserTokenDao:
     result = db.delete_document(
             database_id= self.db_id,
             collection_id= self.collection_id,
-            document_id= user_data[0],
+            document_id= user_data,
         )
 
     return result
