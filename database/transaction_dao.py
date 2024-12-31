@@ -57,7 +57,7 @@ class TransactionDao:
                 Permission.delete(Role.user(user_data[0]))
               ]
           )
-      break
+      
     return result
   
   def delete(self, transaction_id):

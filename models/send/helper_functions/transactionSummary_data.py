@@ -1,12 +1,12 @@
 import pandas as pd
 
 def get_conversion_rate(from_currency, to_currency):
-    currency = {0:  "EUR", 1: "KRW", 2: "KES", 3: "GBP"}
+    currency = {0:  "EUR", 1: "KRW", 2: "KES", 3: "GBP", 4: "USD"}
 
     from_currency = currency[from_currency]
     to_currency = currency[to_currency]
 
-    exchange_table = pd.read_csv('/Users/sginikwo/goldy-personal/co-finance-backend/database/exchange_rates.csv', index_col=0)
+    exchange_table = pd.read_csv('./exchange_rates.csv', index_col=0)
     # Return 1 if both currencies are the same
     if from_currency == to_currency:
         return 1
@@ -64,9 +64,10 @@ def create_dataframe(transactions, uCurrency):
     df["date"] = pd.to_datetime(df["date"], format="%Y-%m-%d")  # Adjust format as needed
     # max_date = df["date"].max().strftime("%Y-%m-%d")
     df["date"] = df["date"].astype(str)
+    df["amount"] = df["amount"].astype(str)
 
     # Select the desired columns
-    df = df[['day', 'month', 'year', 'monthlyBalance', 'monthlyExpenses', 'monthlySavings', "monthlyInvestment", "transactionId", 'monthlyIncome', 'date']]
+    df = df[['day', 'month', 'year', 'monthlyBalance', 'monthlyExpenses', 'monthlySavings', "monthlyInvestment", "transactionId", 'monthlyIncome', 'date', 'amount']]
     
     return df
 

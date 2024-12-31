@@ -48,15 +48,15 @@ class SummaryDao:
 
     for row in data:
       if exist_summary:
-        results = [(entry['date'], entry['$id']) for entry in exist_summary]
+        results = [(entry['date'], entry['transactionId'], entry['$id']) for entry in exist_summary]
 
         for result in results:
-          if result[0] == row["date"]:
+          if result[0] == row["date"] and result[1] == row["transactionId"]:
 
             db.update_document(
                 database_id= self.db_id,
                 collection_id= self.collection_id,
-                document_id= result[1],
+                document_id= result[2],
                 data=row,
                 permissions=[
                     Permission.read(Role.user(user_data[0])),

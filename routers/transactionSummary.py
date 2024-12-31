@@ -38,6 +38,13 @@ async def forecast(user: list = Depends(validate_jwt)):
 
   return "OK"
 
+@router.get("/list", status_code=200)
+async def forecast(user: list = Depends(validate_jwt)):
+  
+  all_summaries = SummaryDao().get_summary()
+
+  return all_summaries
+
 @router.get("/summary", status_code=200)
 async def forecast(user: list = Depends(validate_jwt)):
   
