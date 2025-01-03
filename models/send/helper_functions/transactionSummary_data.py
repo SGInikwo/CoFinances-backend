@@ -72,15 +72,27 @@ def create_dataframe(transactions, uCurrency):
     return df
 
 
-def summary_dataframe(transactions):
+def summary_dataframe(transactions, month=None, year=None):
     df = pd.DataFrame.from_dict(transactions)
 
     # Ensure date column is datetime
     df['date'] = pd.to_datetime(df['date'])
 
     # Get latest month's data
-    latest_month = df['date'].max().month
-    latest_year = df['date'].max().year
+    if month == "null" and year == "null":
+        latest_month = df['date'].max().month
+        latest_year = df['date'].max().year
+    else:
+        print("here")
+        temp_data = {'month_name': [month], "year": [year]}
+        temp_df = pd.DataFrame(temp_data)
+
+        temp_df['month_number'] = pd.to_datetime(temp_df['month_name'], format='%B').dt.month
+        temp_df['year'] = pd.to_datetime(temp_df['year']).dt.year
+
+        latest_month = temp_df['month_number'].max()
+        latest_year = temp_df['year'].max()
+
     latest_data = df[(df['date'].dt.month == latest_month) & (df['date'].dt.year == latest_year)]
 
     # Extract balance, expenses, and savings
@@ -89,3 +101,12 @@ def summary_dataframe(transactions):
     latest_summary = latest_summary.to_dict(orient='records')
 
     return latest_summary[0]
+
+
+def monthly_dataframe(summary):
+    df = pd.DataFrame.from_dict(summary)
+
+    df = df.groupby(["month", "year"]).agg({'monthlyExpenses': 'first'}).reset_index()
+
+
+    return df[["month", "year"]].to_dict(orient='records')

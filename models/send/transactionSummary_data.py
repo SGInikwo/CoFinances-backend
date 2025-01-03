@@ -1,4 +1,4 @@
-from models.send.helper_functions.transactionSummary_data import create_dataframe, summary_dataframe
+from models.send.helper_functions.transactionSummary_data import create_dataframe, monthly_dataframe, summary_dataframe
 
 
 def get_insert_data(transactions, uCurrency):
@@ -7,7 +7,13 @@ def get_insert_data(transactions, uCurrency):
   return df.to_dict(orient='records')
 
 
-def custom_summary(transactions):
-  response = summary_dataframe(transactions)
+def custom_summary(transactions, month, year):
+  response = summary_dataframe(transactions, month, year)
 
+  return response
+
+
+def list_of_months(summary):
+  response = monthly_dataframe(summary)
+  
   return response

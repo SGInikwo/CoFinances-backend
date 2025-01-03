@@ -45,9 +45,22 @@ async def forecast(user: list = Depends(validate_jwt)):
 
   return all_summaries
 
-@router.get("/summary", status_code=200)
-async def forecast(user: list = Depends(validate_jwt)):
-  
-  summary = SummaryDao().get_custom_summary()
+
+@router.get("/summary-{month}-{year}", status_code=200)
+async def forecast(month, year, user: list = Depends(validate_jwt)):
+  try:
+    summary = SummaryDao().get_custom_summary(month, year)
+  except:
+    summary = None
 
   return summary
+
+@router.get("/months", status_code=200)
+async def forecast(user: list = Depends(validate_jwt)):
+  
+  try:
+    months = SummaryDao().get_months(user)
+  except:
+    months = None
+
+  return months

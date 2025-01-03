@@ -2,7 +2,7 @@ from database.deps import createAdminClient, DATABASE_ID, TRANSACTIONSUMMARY_COL
 from appwrite.services.databases import Databases
 from appwrite.permission import Permission
 from appwrite.role import Role
-from models.send.transactionSummary_data import custom_summary, get_insert_data
+from models.send.transactionSummary_data import custom_summary, get_insert_data, list_of_months
 from database.transaction_dao import TransactionDao
 import secrets
 from appwrite.query import Query
@@ -15,6 +15,7 @@ class SummaryDao:
   def __init__(self):
     self.db_id = DATABASE_ID
     self.collection_id = TRANSACTIONSUMMARY_COLLECTION_ID
+  
 
   def get_summary(self, user_data=None):
     result = db.list_documents(
@@ -31,10 +32,10 @@ class SummaryDao:
     return result['documents']
   
 
-  def get_custom_summary(self):
+  def get_custom_summary(self, month=None, year=None):
     transactions = self.get_summary()
 
-    response = custom_summary(transactions)
+    response = custom_summary(transactions, month, year)
     
     return response
 
@@ -77,5 +78,14 @@ class SummaryDao:
           ]
         )
     
-
     return "OK"
+  
+
+  def get_months(self, user_data):
+    exist_summary = self.get_summary()
+
+    months = list_of_months(exist_summary)
+
+    print(months)
+    
+    return months
