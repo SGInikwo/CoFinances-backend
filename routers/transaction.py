@@ -17,7 +17,7 @@ security = HTTPBearer()
 
 async def validate_jwt(authorization: str = Depends(security)):
   token = authorization.credentials  # Extract the token from the Authorization header
-  # print(token)
+
   db = createSessionClient().set_jwt(token)
 
   databases = Databases(db)
@@ -26,8 +26,6 @@ async def validate_jwt(authorization: str = Depends(security)):
     database_id=DATABASE_ID,
     collection_id=USER_COLLECTION_ID
   )
-
-  # print(documents)
 
   userId = documents["documents"][0]["userId"]
   currency = documents["documents"][0]["currency"]
@@ -40,10 +38,17 @@ async def forecast(requests: Union[List[Transactions_ing], List[Transactions_rev
 
   return "OK"
 
-@router.get("/list")
-async def forecast(user: list = Depends(validate_jwt)):
+@router.get("/list-{month}-{year}")
+async def forecast(month, year, user: list = Depends(validate_jwt)):
   
-  response = TransactionDao().get_transactions(user_data=user)
+  response = TransactionDao().get_transactions(user_data=user, month=month, year=year)
+
+  return response
+
+@router.get("/current-expenses-{month}-{year}")
+async def forecast(month, year, user: list = Depends(validate_jwt)):
+  
+  response = TransactionDao().get_transactions(user_data=user, month=month, year=year)
 
   return response
 

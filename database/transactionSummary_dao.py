@@ -85,7 +85,5 @@ class SummaryDao:
     exist_summary = self.get_summary()
 
     months = list_of_months(exist_summary)
-
-    print(months)
     
     return months

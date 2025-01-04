@@ -5,6 +5,7 @@ from appwrite.role import Role
 from appwrite.query import Query
 from models.receive.transactions import Transactions_ing, Transactions_revolut, Transactions_shinha
 import secrets
+from datetime import datetime
 
 from models.send.transactions import get_insert_data
 
@@ -17,8 +18,8 @@ class TransactionDao:
     self.collection_id = TRANSACTION_COLLECTION_ID
 
 
-  def get_transactions(self, user_data):
-    result = db.list_documents(
+  def get_transactions(self, user_data, month=None, year=None):
+    results = db.list_documents(
       database_id = self.db_id,
       collection_id = self.collection_id,
       queries=[
@@ -26,11 +27,28 @@ class TransactionDao:
             ]
     )
 
-    for rsul in result["documents"]:
+    for rsul in results["documents"]:
       rsul.pop("userId", None)
       rsul.pop('$permissions', None)
 
-    return result['documents']
+    latest_date = datetime.strptime(results["documents"][0]["date"], "%Y-%m-%d").strftime("%Y-%m")
+    if month == "null" and year == "null":
+      transactions_results = [
+        resutl
+        for resutl in results['documents']
+        if datetime.strptime(resutl["date"], "%Y-%m-%d").strftime("%Y-%m") == latest_date
+      ]
+      return transactions_results
+    else:
+      month_number = datetime.strptime(month, "%B").month
+      transactions_results = [
+        resutl
+        for resutl in results['documents']
+        if datetime.strptime(resutl["date"], "%Y-%m-%d").strftime("%Y-%m") == f"{year}-{month_number}"
+      ]
+
+      return transactions_results
+
   
   def get_transaction(self, transaction_id):
     result = db.get_document(
@@ -45,7 +63,6 @@ class TransactionDao:
     data = get_insert_data(data, user_data)
 
     for row in data:
-      print(row)
       result = db.create_document(
               database_id= self.db_id,
               collection_id= self.collection_id,

@@ -83,7 +83,6 @@ def summary_dataframe(transactions, month=None, year=None):
         latest_month = df['date'].max().month
         latest_year = df['date'].max().year
     else:
-        print("here")
         temp_data = {'month_name': [month], "year": [year]}
         temp_df = pd.DataFrame(temp_data)
 
