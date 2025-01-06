@@ -3,7 +3,7 @@ from appwrite.services.databases import Databases
 from appwrite.permission import Permission
 from appwrite.role import Role
 from models.send.transactionSummary_data import custom_summary, get_insert_data, list_of_months
-from database.transaction_dao import TransactionDao
+# from database.transaction_dao import TransactionDao
 import secrets
 from appwrite.query import Query
 
@@ -40,11 +40,16 @@ class SummaryDao:
     return response
 
   
-  def push_data(self, user_data):
-    transactions = TransactionDao().get_transactions(user_data=user_data[0])
+  def push_data(self, user_data, month=None, year=None, all=False):
+    from database.transaction_dao import TransactionDao
+
+    if all==False:
+      transactions = TransactionDao().get_transactions(user_data=user_data[0])
+    else:
+      transactions = TransactionDao().get_transactions(user_data=user_data[0], month=month, year=year)
 
     data = get_insert_data(transactions, user_data[1])
-
+    
     exist_summary = self.get_summary()
 
     for row in data:

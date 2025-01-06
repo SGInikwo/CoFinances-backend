@@ -31,12 +31,14 @@ async def validate_jwt(authorization: str = Depends(security)):
   currency = documents["documents"][0]["currency"]
   return [userId, currency]
 
+
 @router.post("/", status_code=200)
 async def forecast(user: list = Depends(validate_jwt)):
   
   SummaryDao().push_data(user_data=user)
 
   return "OK"
+
 
 @router.get("/list", status_code=200)
 async def forecast(user: list = Depends(validate_jwt)):
@@ -54,6 +56,7 @@ async def forecast(month, year, user: list = Depends(validate_jwt)):
     summary = None
 
   return summary
+
 
 @router.get("/months", status_code=200)
 async def forecast(user: list = Depends(validate_jwt)):

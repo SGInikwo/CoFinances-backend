@@ -3,6 +3,9 @@ import pandas as pd
 def get_conversion_rate(from_currency, to_currency):
     currency = {0:  "EUR", 1: "KRW", 2: "KES", 3: "GBP", 4: "USD"}
 
+    from_currency = int(from_currency)
+    to_currency = int(from_currency)
+
     from_currency = currency[from_currency]
     to_currency = currency[to_currency]
 
@@ -72,6 +75,35 @@ def create_dataframe(transactions, uCurrency):
     return df
 
 
+# def summary_dataframe(transactions, month=None, year=None):
+#     df = pd.DataFrame.from_dict(transactions)
+
+#     # Ensure date column is datetime
+#     df['date'] = pd.to_datetime(df['date'])
+
+#     # Get latest month's data
+#     if month == "null" and year == "null":
+#         latest_month = df['date'].max().month
+#         latest_year = df['date'].max().year
+#     else:
+#         temp_data = {'month_name': [month], "year": [year]}
+#         temp_df = pd.DataFrame(temp_data)
+
+#         temp_df['month_number'] = pd.to_datetime(temp_df['month_name'], format='%B').dt.month
+#         temp_df['year'] = pd.to_datetime(temp_df['year']).dt.year
+
+#         latest_month = temp_df['month_number'].max()
+#         latest_year = temp_df['year'].max()
+
+#     latest_data = df[(df['date'].dt.month == latest_month) & (df['date'].dt.year == latest_year)]
+
+#     # Extract balance, expenses, and savings
+#     latest_summary = latest_data[['monthlyBalance', 'monthlyExpenses', 'monthlySavings']].drop_duplicates()
+
+#     latest_summary = latest_summary.to_dict(orient='records')
+
+#     return latest_summary[0]
+
 def summary_dataframe(transactions, month=None, year=None):
     df = pd.DataFrame.from_dict(transactions)
 
@@ -80,8 +112,15 @@ def summary_dataframe(transactions, month=None, year=None):
 
     # Get latest month's data
     if month == "null" and year == "null":
-        latest_month = df['date'].max().month
-        latest_year = df['date'].max().year
+        # Get the latest and second latest date
+        latest_date = df['date'].max()
+        second_latest_date = df[df['date'] < latest_date]['date'].max()
+
+        # Get the latest month and year from the dates
+        latest_month = latest_date.month
+        latest_year = latest_date.year
+        second_latest_month = second_latest_date.month
+        second_latest_year = second_latest_date.year
     else:
         temp_data = {'month_name': [month], "year": [year]}
         temp_df = pd.DataFrame(temp_data)
@@ -92,15 +131,29 @@ def summary_dataframe(transactions, month=None, year=None):
         latest_month = temp_df['month_number'].max()
         latest_year = temp_df['year'].max()
 
+        # Find second latest month and year based on the same logic
+        second_latest_month = latest_month - 1 if latest_month > 1 else 12
+        second_latest_year = latest_year if latest_month > 1 else latest_year - 1
+
+    # Get the data for both the latest and second latest month
     latest_data = df[(df['date'].dt.month == latest_month) & (df['date'].dt.year == latest_year)]
+    second_latest_data = df[(df['date'].dt.month == second_latest_month) & (df['date'].dt.year == second_latest_year)]
 
-    # Extract balance, expenses, and savings
+    # Extract balance, expenses, and savings for both months
     latest_summary = latest_data[['monthlyBalance', 'monthlyExpenses', 'monthlySavings']].drop_duplicates()
+    second_latest_summary = second_latest_data[['monthlyBalance', 'monthlyExpenses', 'monthlySavings']].drop_duplicates()
 
-    latest_summary = latest_summary.to_dict(orient='records')
+    # Combine latest and second latest data into a single summary
+    combined_summary = {
+        'monthlyBalance': latest_summary['monthlyBalance'].values[0] if not latest_summary.empty else None,
+        'monthlyExpenses': latest_summary['monthlyExpenses'].values[0] if not latest_summary.empty else None,
+        'monthlySavings': latest_summary['monthlySavings'].values[0] if not latest_summary.empty else None,
+        'earliestBalance': second_latest_summary['monthlyBalance'].values[0] if not second_latest_summary.empty else None,
+        'earliestExpenses': second_latest_summary['monthlyExpenses'].values[0] if not second_latest_summary.empty else None,
+        'earliestSavings': second_latest_summary['monthlySavings'].values[0] if not second_latest_summary.empty else None
+    }
 
-    return latest_summary[0]
-
+    return combined_summary
 
 def monthly_dataframe(summary):
     df = pd.DataFrame.from_dict(summary)
