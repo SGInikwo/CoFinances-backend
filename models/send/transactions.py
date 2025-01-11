@@ -3,7 +3,7 @@ from typing import Optional, Union, List
 from models.receive.transactions import Transactions_ing, Transactions_revolut, Transactions_shinha
 import secrets
 
-from models.send.helper_functions.transaction_data import amount_transform, balance_transform, currency_update_dataframe, date_transform, earliest_date_dataframe, get_currency, is_valid_date
+from models.send.helper_functions.transaction_data import amount_transform, balance_transform, currency_update_dataframe, current_analysis_dataframe, date_transform, earliest_date_dataframe, get_currency, is_valid_date, past_analysis_dataframe
 
 def get_insert_data(requests: Union[List[Transactions_ing], List[Transactions_revolut], List[Transactions_shinha]], clientCurrency, user_data):
   data = []
@@ -72,8 +72,17 @@ def get_insert_data(requests: Union[List[Transactions_ing], List[Transactions_re
 
 def currency_response(transactions, cleintCurrency):
    response = currency_update_dataframe(transactions, cleintCurrency)
-
    return response
+
+def current_analysis(transactions):
+   response = current_analysis_dataframe(transactions)
+   return response
+
+def past_analysis(transactions, month, year):
+   response = past_analysis_dataframe(transactions, month, year)
+   return response
+
+
 
 class Transactions(BaseModel):
   id: str

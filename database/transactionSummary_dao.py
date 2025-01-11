@@ -28,16 +28,19 @@ class SummaryDao:
     for rsul in result["documents"]:
       rsul.pop("userId", None)
       rsul.pop('$permissions', None)
-
     return result['documents']
   
 
   def get_custom_summary(self, month=None, year=None):
     transactions = self.get_summary()
-
     response = custom_summary(transactions, month, year)
-    
     return response
+  
+  
+  def get_months(self, user_data):
+    exist_summary = self.get_summary()
+    months = list_of_months(exist_summary)
+    return months
 
   
   def push_data(self, user_data, month=None, year=None, all=False):
@@ -49,7 +52,6 @@ class SummaryDao:
       transactions = TransactionDao().get_transactions(user_data=user_data[0], month=month, year=year)
 
     data = get_insert_data(transactions, user_data[1])
-    
     exist_summary = self.get_summary()
 
     for row in data:
@@ -58,7 +60,6 @@ class SummaryDao:
 
         for result in results:
           if result[0] == row["date"] and result[1] == row["transactionId"]:
-
             db.update_document(
                 database_id= self.db_id,
                 collection_id= self.collection_id,
@@ -82,13 +83,4 @@ class SummaryDao:
               Permission.delete(Role.user(user_data[0]))
           ]
         )
-    
     return "OK"
-  
-
-  def get_months(self, user_data):
-    exist_summary = self.get_summary()
-
-    months = list_of_months(exist_summary)
-    
-    return months

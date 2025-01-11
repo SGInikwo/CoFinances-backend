@@ -33,30 +33,32 @@ async def validate_jwt(authorization: str = Depends(security)):
 
 @router.post("/", status_code=200)
 async def forecast(requests: Union[TransactionsRequest_ing, TransactionsRequest_revolut, TransactionsRequest_shinha], user: list = Depends(validate_jwt)):
-
   TransactionDao().save(data=requests, user_data=user)
-
-  return "OK"
-
-@router.post("/update_balances-{clientCurrency}", status_code=200)
-async def forecast(clientCurrency, user: list = Depends(validate_jwt)):
-  
-  TransactionDao().update_currency(cleintCurrency=int(clientCurrency), user_data=user)
-
   return "OK"
 
 @router.get("/list-{month}-{year}")
 async def forecast(month, year, user: list = Depends(validate_jwt)):
-  
   response = TransactionDao().get_transactions(user_data=user, month=month, year=year)
-
   return response
+
+@router.get("/analysis-current-{month}-{year}")
+async def forecast(month, year, user: list = Depends(validate_jwt)):
+  response = TransactionDao().current_month_expenses(user_data=user, month=month, year=year)
+  return response
+
+@router.get("/analysis-past-{month}-{year}")
+async def forecast(month, year, user: list = Depends(validate_jwt)):
+  response = TransactionDao().past_month_expenses(user_data=user, month=month, year=year)
+  return response
+
+@router.post("/update_balances-{clientCurrency}", status_code=200)
+async def forecast(clientCurrency, user: list = Depends(validate_jwt)):
+  TransactionDao().update_currency(cleintCurrency=int(clientCurrency), user_data=user)
+  return "OK"
 
 @router.get("/current-expenses-{month}-{year}")
 async def forecast(month, year, user: list = Depends(validate_jwt)):
-  
   response = TransactionDao().get_transactions(user_data=user, month=month, year=year)
-
   return response
 
 
