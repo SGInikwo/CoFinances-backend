@@ -18,7 +18,7 @@ security = HTTPBearer()
 
 async def validate_jwt(authorization: str = Depends(security)):
   token = authorization.credentials  # Extract the token from the Authorization header
-  print(token)
+  # print(token)
   db = createSessionClient().set_jwt(token)
 
   databases = Databases(db)
@@ -28,7 +28,7 @@ async def validate_jwt(authorization: str = Depends(security)):
     collection_id=USER_COLLECTION_ID
   )
 
-  print(documents)
+  # print(documents)
 
   userId = documents["documents"][0]["userId"]
   # currency = documents["documents"][0]["currency"]

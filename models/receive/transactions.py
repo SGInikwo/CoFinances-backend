@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import Optional, Union
+from typing import Optional, Union, List
 
 class Transactions_ing(BaseModel):
   date: int = Field(alias="Date")
@@ -35,3 +35,16 @@ class Transactions_shinha(BaseModel):
   recipient: Optional[str] = Field(alias="__EMPTY_4", default=None)
   balance: Optional[Union[str, int]] = Field(alias="__EMPTY_5", default=None)
   transaction_place: Optional[str] = Field(alias="__EMPTY_6", default=None)
+
+
+class TransactionsRequest_ing(BaseModel):
+  transactions: List[Transactions_ing]
+  clientCurrency: str
+
+class TransactionsRequest_revolut(BaseModel):
+  transactions: List[Transactions_revolut]
+  clientCurrency: str
+
+class TransactionsRequest_shinha(BaseModel):
+  transactions: List[Transactions_shinha]
+  clientCurrency: str

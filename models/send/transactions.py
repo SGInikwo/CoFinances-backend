@@ -3,9 +3,9 @@ from typing import Optional, Union, List
 from models.receive.transactions import Transactions_ing, Transactions_revolut, Transactions_shinha
 import secrets
 
-from models.send.helper_functions.transaction_data import amount_transform, balance_transform, date_transform, get_currency, is_valid_date
+from models.send.helper_functions.transaction_data import amount_transform, balance_transform, currency_update_dataframe, current_analysis_dataframe, date_transform, earliest_date_dataframe, get_currency, is_valid_date, past_analysis_dataframe
 
-def get_insert_data(requests: Union[List[Transactions_ing], List[Transactions_revolut], List[Transactions_shinha]], user_data):
+def get_insert_data(requests: Union[List[Transactions_ing], List[Transactions_revolut], List[Transactions_shinha]], clientCurrency, user_data):
   data = []
   for request in requests:
     request_dict = dict(request)
@@ -21,7 +21,10 @@ def get_insert_data(requests: Union[List[Transactions_ing], List[Transactions_re
            "transactionDetails": request_dict["notification"],
            "icon": 0,
            "userCurrency": int(user_data[1]),
-           "balance": balance_transform(request_dict["balance"], "Ing")
+           "balance": balance_transform(request_dict["balance"], "Ing"),
+           "originalAmount": amount_transform(request_dict["amount"], request_dict["debit_credit"], "Ing"),
+           "originalBalance": balance_transform(request_dict["balance"], "Ing"),
+           "originalCurrency": int(clientCurrency),
         }
         data.append(request_data)
     elif isinstance(request, Transactions_revolut):
@@ -36,7 +39,10 @@ def get_insert_data(requests: Union[List[Transactions_ing], List[Transactions_re
            "transactionDetails": request_dict["description"],
            "icon": 0,
            "userCurrency": int(user_data[1]),
-           "balance": balance_transform(request_dict["balance"], "Revolut")
+           "balance": balance_transform(request_dict["balance"], "Revolut"),
+           "originalAmount": amount_transform(request_dict["amount"], "None", "Revolut"),
+           "originalBalance": balance_transform(request_dict["balance"], "Revolut"),
+           "originalCurrency": int(clientCurrency),
         }
         data.append(request_data)
     elif isinstance(request, Transactions_shinha):
@@ -52,13 +58,31 @@ def get_insert_data(requests: Union[List[Transactions_ing], List[Transactions_re
             "transactionDetails": request_dict["description"],
             "icon": 0,
             "userCurrency": int(user_data[1]),
-            "balance": balance_transform(request_dict["balance"], "Shinha")
+            "balance": balance_transform(request_dict["balance"], "Shinha"),
+            "originalAmount": amount_transform(request_dict["withdrawal"], request_dict["deposit"], "Shinha"),
+            "originalBalance": balance_transform(request_dict["balance"], "Shinha"),
+            "originalCurrency": int(clientCurrency),
           }
           data.append(request_data)
     else:
         print("Unknown type")
 
-  return data
+  date = earliest_date_dataframe(data)
+  return data,date
+
+def currency_response(transactions, cleintCurrency):
+   response = currency_update_dataframe(transactions, cleintCurrency)
+   return response
+
+def current_analysis(transactions):
+   response = current_analysis_dataframe(transactions)
+   return response
+
+def past_analysis(transactions, month, year):
+   response = past_analysis_dataframe(transactions, month, year)
+   return response
+
+
 
 class Transactions(BaseModel):
   id: str
@@ -72,6 +96,9 @@ class Transactions(BaseModel):
   icon: int
   userCurrency: int
   balance: str
+  originalAmount: str
+  originalBalance: str
+  originalCurrency: int
 
 class TransactionResponse(BaseModel):
   transactionList: list[Transactions]
