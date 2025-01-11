@@ -36,6 +36,11 @@ async def forecast(requests: Union[TransactionsRequest_ing, TransactionsRequest_
   TransactionDao().save(data=requests, user_data=user)
   return "OK"
 
+@router.get("/list-all")
+async def forecast(user: list = Depends(validate_jwt)):
+  response = TransactionDao().get_all_transactions()
+  return response
+
 @router.get("/list-{month}-{year}")
 async def forecast(month, year, user: list = Depends(validate_jwt)):
   response = TransactionDao().get_transactions(user_data=user, month=month, year=year)
