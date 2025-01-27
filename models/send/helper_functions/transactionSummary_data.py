@@ -4,7 +4,7 @@ def get_conversion_rate(from_currency, to_currency):
     currency = {0:  "EUR", 1: "KRW", 2: "KES", 3: "GBP", 4: "USD"}
 
     from_currency = int(from_currency)
-    to_currency = int(from_currency)
+    to_currency = int(to_currency)
 
     from_currency = currency[from_currency]
     to_currency = currency[to_currency]
@@ -23,12 +23,6 @@ def create_dataframe(transactions, uCurrency):
     # Convert 'date' to datetime and extract year, month, day
     df['date'] = pd.to_datetime(df['date'])
     df['day'], df['month'], df['year'] = df['date'].dt.day.astype(int), df['date'].dt.month_name(), df['date'].dt.year.astype(int)
-
-    # Convert 'amount' and 'balance' to userCurrency
-    df[['amount', 'balance']] = df.apply(
-        lambda row: row[['amount', 'balance']].astype(float) * get_conversion_rate(row['currency'], uCurrency),
-        axis=1
-    )
 
     # Convert 'amount' and 'balance' temporarily for calculations
     df[['amount_num', 'balance_num']] = df[['amount', 'balance']].apply(pd.to_numeric, errors='coerce')

@@ -87,7 +87,6 @@ def get_currency(data):
 
 def currency_update_dataframe(transactions, cleintCurrency):
   df = pd.DataFrame.from_dict(transactions)
-
   # Convert 'amount' and 'balance' to userCurrency
   df[['amount', 'balance']] = df.apply(
       lambda row: row[['originalAmount', 'originalBalance']].astype(float) * get_conversion_rate(row['originalCurrency'], cleintCurrency),
