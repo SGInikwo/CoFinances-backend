@@ -29,13 +29,13 @@ async def validate_jwt(authorization: str = Depends(security)):
 
   userId = documents["documents"][0]["userId"]
   currency = documents["documents"][0]["currency"]
-  return [userId, currency]
+  return [userId, currency, databases]
 
 
 @router.post("/", status_code=200)
 async def forecast(user: list = Depends(validate_jwt)):
   
-  SummaryDao().push_data(user_data=user)
+  SummaryDao(user[2]).push_data(user_data=user)
 
   return "OK"
 
@@ -43,7 +43,7 @@ async def forecast(user: list = Depends(validate_jwt)):
 @router.get("/list", status_code=200)
 async def forecast(user: list = Depends(validate_jwt)):
   
-  all_summaries = SummaryDao().get_summary()
+  all_summaries = SummaryDao(user[2]).get_summary()
 
   return all_summaries
 
@@ -51,7 +51,7 @@ async def forecast(user: list = Depends(validate_jwt)):
 @router.get("/summary-{month}-{year}", status_code=200)
 async def forecast(month, year, user: list = Depends(validate_jwt)):
   try:
-    summary = SummaryDao().get_custom_summary(month, year)
+    summary = SummaryDao(user[2]).get_custom_summary(month, year)
   except:
     summary = None
 
@@ -62,7 +62,7 @@ async def forecast(month, year, user: list = Depends(validate_jwt)):
 async def forecast(user: list = Depends(validate_jwt)):
   
   try:
-    months = SummaryDao().get_months(user)
+    months = SummaryDao(user[2]).get_months(user)
   except:
     months = None
 

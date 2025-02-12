@@ -10,18 +10,19 @@ from database.transactionSummary_dao import SummaryDao
 
 from models.send.transactions import currency_response, current_analysis, get_insert_data, past_analysis
 
-client = createAdminClient()
-db = Databases(client)
+# client = createAdminClient()
+# db = Databases(client)
 
 class TransactionDao:
-  def __init__(self):
+  def __init__(self, db):
+    self.db = db
     self.db_id = DATABASE_ID
     self.collection_id = TRANSACTION_COLLECTION_ID
 
   
   def get_all_transactions(self):
     # Fetch documents from the database
-    results = db.list_documents(
+    results = self.db.list_documents(
         database_id=self.db_id,
         collection_id=self.collection_id,
         queries=[
@@ -37,7 +38,7 @@ class TransactionDao:
 
   def get_transactions(self, user_data=None, month=None, year=None):
     # Fetch documents from the database
-    results = db.list_documents(
+    results = self.db.list_documents(
         database_id=self.db_id,
         collection_id=self.collection_id,
         queries=[
@@ -73,7 +74,7 @@ class TransactionDao:
 
   
   def get_transaction(self, transaction_id):
-    result = db.get_document(
+    result = self.db.get_document(
             database_id= self.db_id,
             collection_id= self.collection_id,
             document_id=transaction_id
@@ -82,15 +83,21 @@ class TransactionDao:
   
 
   def current_month_expenses(self, user_data=None, month=None, year=None):
-    transactions = self.get_transactions(month=month, year=year)
-    response = current_analysis(transactions)
+    try:
+      transactions = self.get_transactions(month=month, year=year)
+      response = current_analysis(transactions)
+    except:
+       return None
     # print(response)
     return response
   
 
   def past_month_expenses(self, user_data=None, month=None, year=None):
-    transactions = self.get_all_transactions()
-    response = past_analysis(transactions, month, year)
+    try:
+      transactions = self.get_all_transactions()
+      response = past_analysis(transactions, month, year)
+    except:
+       return None
 
     # print(response)
     return response
@@ -104,7 +111,7 @@ class TransactionDao:
       response.pop("$databaseId", None)
       response.pop("$collectionId", None)
 
-      db.update_document(
+      self.db.update_document(
           database_id= self.db_id,
           collection_id= self.collection_id,
           document_id= response["$id"],
@@ -113,7 +120,7 @@ class TransactionDao:
     
   
   def update(self, transaction_id, data):
-    result = db.update_document(
+    result = self.db.update_document(
             database_id= self.db_id,
             collection_id= self.collection_id,
             document_id= transaction_id,
@@ -126,7 +133,7 @@ class TransactionDao:
     data = get_insert_data(data.transactions, data.clientCurrency, user_data)
 
     for row in data[0]:
-      result = db.create_document(
+      result = self.db.create_document(
               database_id= self.db_id,
               collection_id= self.collection_id,
               document_id=secrets.token_hex(8),
@@ -143,7 +150,7 @@ class TransactionDao:
   
 
   def delete(self, transaction_id):
-    result = db.delete_document(
+    result = self.db.delete_document(
             database_id= self.db_id,
             collection_id= self.collection_id,
             document_id= transaction_id,
