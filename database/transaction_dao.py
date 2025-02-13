@@ -132,21 +132,21 @@ class TransactionDao:
   def save(self, data, user_data):
     data = get_insert_data(data.transactions, data.clientCurrency, user_data)
 
-    for row in data[0]:
-      result = self.db.create_document(
-              database_id= self.db_id,
-              collection_id= self.collection_id,
-              document_id=secrets.token_hex(8),
-              data=row,
-              permissions=[
-                Permission.read(Role.user(user_data[0])),
-                Permission.update(Role.user(user_data[0])),
-                Permission.delete(Role.user(user_data[0]))
-              ]
-          )
-    for date in data[1]:
-      SummaryDao().push_data(user_data=user_data[0], month=date["month"], year=date["year"], all=False)
-    return result
+    # for row in data[0]:
+    #   result = self.db.create_document(
+    #           database_id= self.db_id,
+    #           collection_id= self.collection_id,
+    #           document_id=secrets.token_hex(8),
+    #           data=row,
+    #           permissions=[
+    #             Permission.read(Role.user(user_data[0])),
+    #             Permission.update(Role.user(user_data[0])),
+    #             Permission.delete(Role.user(user_data[0]))
+    #           ]
+    #       )
+    # for date in data[1]:
+    #   SummaryDao(user_data[2]).push_data(user_data=user_data[0], month=date["month"], year=date["year"], all=False)
+    return True
   
 
   def delete(self, transaction_id):

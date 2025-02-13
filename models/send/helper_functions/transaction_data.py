@@ -7,6 +7,19 @@ from fastapi.encoders import jsonable_encoder
 
 
 from models.send.helper_functions.transactionSummary_data import get_conversion_rate
+import re
+from deep_translator import GoogleTranslator
+
+
+def is_not_korean(text):
+    # Regex for detecting Hangul characters (Korean alphabet)
+    return not bool(re.search('[\uac00-\ud7af]', text))
+
+def translate_text(text):
+    if isinstance(text, str) and not text.isdigit():
+        # Use GoogleTranslator from deep_translator
+        return GoogleTranslator(source='ko', target='en').translate(text)
+    return text  # Keep numbers unchanged
 
 def date_transform(date, type):
   if type == "Revolut":
@@ -169,3 +182,18 @@ def past_analysis_dataframe(transactions, month, year):
     latest_5_months = monthly_expenses.nsmallest(5).sort_index(ascending=False).to_dict()
     
     return jsonable_encoder({"last_5": latest_5_months, "top_3": top_expenses})
+
+def transalte_korean_english(transactions):
+  print(f'this is: {transactions[0]["transactionDetails"]}')
+  if is_not_korean(transactions[0]["transactionDetails"]):
+    print("not korean")
+    return transactions
+  
+  df = pd.DataFrame(transactions)
+  print(df)
+
+  df_translated = df.map(translate_text)
+
+  print(df_translated)
+
+  return df_translated.to_dict(orient='records')
