@@ -25,6 +25,8 @@ def get_insert_data(requests: Union[List[Transactions_ing], List[Transactions_re
            "originalAmount": amount_transform(request_dict["amount"], request_dict["debit_credit"], "Ing"),
            "originalBalance": balance_transform(request_dict["balance"], "Ing"),
            "originalCurrency": int(clientCurrency),
+           "isSaving": 0,
+           "isInvesting": 0
         }
         data.append(request_data)
     elif isinstance(request, Transactions_revolut):
@@ -43,6 +45,8 @@ def get_insert_data(requests: Union[List[Transactions_ing], List[Transactions_re
            "originalAmount": amount_transform(request_dict["amount"], "None", "Revolut"),
            "originalBalance": balance_transform(request_dict["balance"], "Revolut"),
            "originalCurrency": int(clientCurrency),
+           "isSaving": 0,
+           "isInvesting": 0
         }
         data.append(request_data)
     elif isinstance(request, Transactions_shinha):
@@ -62,6 +66,8 @@ def get_insert_data(requests: Union[List[Transactions_ing], List[Transactions_re
             "originalAmount": amount_transform(request_dict["withdrawal"], request_dict["deposit"], "korean"),
             "originalBalance": balance_transform(request_dict["balance"], "Shinha"),
             "originalCurrency": int(clientCurrency),
+            "isSaving": 0,
+            "isInvesting": 0
           }
           data.append(request_data)
     elif isinstance(request, Transactions_kb):
@@ -82,6 +88,8 @@ def get_insert_data(requests: Union[List[Transactions_ing], List[Transactions_re
             "originalAmount": amount_transform(request_dict["withdrawal"], request_dict["deposit"], "korean"),
             "originalBalance": balance_transform(request_dict["balance"], "Shinha"),
             "originalCurrency": int(clientCurrency),
+            "isSaving": 0,
+            "isInvesting": 0,
           }
           data.append(request_data)
     else:
@@ -120,6 +128,8 @@ class Transactions(BaseModel):
   originalAmount: str
   originalBalance: str
   originalCurrency: int
+  isSaving: int
+  isInvesting: int
 
 class TransactionResponse(BaseModel):
   transactionList: list[Transactions]

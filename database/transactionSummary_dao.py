@@ -3,13 +3,9 @@ from appwrite.services.databases import Databases
 from appwrite.permission import Permission
 from appwrite.role import Role
 from models.send.transactionSummary_data import custom_summary, get_insert_data, list_of_months
-# from database.transaction_dao import TransactionDao
 import secrets
 from appwrite.query import Query
 
-
-# client = createAdminClient()
-# db = Databases(client)
 
 class SummaryDao:
   def __init__(self, db):
