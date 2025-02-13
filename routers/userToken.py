@@ -49,7 +49,7 @@ async def forecast(user: list = Depends(validate_jwt)):
   return response
 
 @router.delete("/delete/{user_id}")
-async def forecast(user_id: str):
+async def forecast(user_id: str, user: list = Depends(validate_jwt)):
   
   response = UserTokenDao().delete(user_data=user_id)
 

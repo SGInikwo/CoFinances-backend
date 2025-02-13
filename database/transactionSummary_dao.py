@@ -8,17 +8,18 @@ import secrets
 from appwrite.query import Query
 
 
-client = createAdminClient()
-db = Databases(client)
+# client = createAdminClient()
+# db = Databases(client)
 
 class SummaryDao:
-  def __init__(self):
+  def __init__(self, db):
+    self.db = db
     self.db_id = DATABASE_ID
     self.collection_id = TRANSACTIONSUMMARY_COLLECTION_ID
   
 
   def get_summary(self, user_data=None):
-    result = db.list_documents(
+    result = self.db.list_documents(
       database_id = self.db_id,
       collection_id = self.collection_id,
       queries=[
@@ -47,9 +48,9 @@ class SummaryDao:
     from database.transaction_dao import TransactionDao
 
     if all==False:
-      transactions = TransactionDao().get_transactions(user_data=user_data[0])
+      transactions = TransactionDao(user_data[2]).get_transactions(user_data=user_data[0])
     else:
-      transactions = TransactionDao().get_transactions(user_data=user_data[0], month=month, year=year)
+      transactions = TransactionDao(user_data[2]).get_transactions(user_data=user_data[0], month=month, year=year)
 
     data = get_insert_data(transactions, user_data[1])
     exist_summary = self.get_summary()
@@ -60,7 +61,7 @@ class SummaryDao:
 
         for result in results:
           if result[0] == row["date"] and result[1] == row["transactionId"]:
-            db.update_document(
+            self.db.update_document(
                 database_id= self.db_id,
                 collection_id= self.collection_id,
                 document_id= result[2],
@@ -72,7 +73,7 @@ class SummaryDao:
                 ]
             )
       else:
-        db.create_document(
+        self.db.create_document(
           database_id= self.db_id,
           collection_id= self.collection_id,
           document_id=secrets.token_hex(8),
