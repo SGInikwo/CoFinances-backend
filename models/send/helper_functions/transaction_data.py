@@ -36,14 +36,20 @@ def date_transform(date, type):
     parsed_date = datetime.strptime(str(date_input), "%Y%m%d")
     date = parsed_date.strftime("%Y-%m-%d")
     return date
+  
+  if type == "kb":
+    date_input = date
+    parsed_date = datetime.strptime(str(date_input), "%Y.%m.%d %H:%M:%S")
+    date = parsed_date.strftime("%Y-%m-%d")
+    return date
 
 def amount_transform(withdraw, deposit_or, bank):
-  if bank == "Shinha":
-    if withdraw != 0 or withdraw != None:
+  if bank == "korean":
+    if withdraw != 0 and withdraw != None:
       amount = f"-{withdraw}"
       return amount
     else:
-      return f"-{deposit_or}"
+      return f"{deposit_or}"
   
   if bank == "Revolut":
     amount = float(withdraw)
@@ -86,13 +92,17 @@ def balance_transform(balance, bank):
     return balance
 
 def is_valid_date(date_string: str) -> bool:
-    try:
-        # Attempt to parse the date string with the specified format
-        datetime.strptime(date_string, "%Y-%m-%d")
-        return True
-    except ValueError:
-        # If parsing fails, the format is incorrect
-        return False
+    # Define acceptable date formats
+    formats = ["%Y-%m-%d", "%Y/%m/%d", "%d-%m-%Y", "%d/%m/%Y", "%Y.%m.%d %H:%M:%S"]
+
+    for fmt in formats:
+        try:
+            datetime.strptime(date_string, fmt)
+            return True  # Valid date format found
+        except:
+            continue  # Try the next format
+    
+    return False  # No valid format found
     
 def get_currency(data):
   currency = {"EUR": 0, "KRW": 1, "KES": 2, "GBP": 3,  "USD": 4}
