@@ -37,7 +37,6 @@ class Transactions_shinha(BaseModel):
   transaction_place: Optional[str] = Field(alias="__EMPTY_6", default=None)
 
 class Transactions_kb(BaseModel):
-  # date_time: str = Field(alias="조회기간")
   date_time: Optional[str] = Field(alias="조회기간", default=None)
   recipient: Optional[str] = Field(alias="__EMPTY", default=None)
   memo: Optional[str] = Field(alias="__EMPTY_1", default=None)
