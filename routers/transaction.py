@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, Depends, Request
 from typing import Union, List, Dict
 from models.send.transactions import TransactionResponse
-from models.receive.transactions import Transactions_ing, Transactions_revolut, Transactions_shinha, TransactionsRequest_ing, TransactionsRequest_revolut, TransactionsRequest_shinha
+from models.receive.transactions import Transactions_ing, Transactions_revolut, Transactions_shinha, TransactionsRequest_ing, TransactionsRequest_kb, TransactionsRequest_revolut, TransactionsRequest_shinha
 import httpx
 from database.deps import createSessionClient, DATABASE_ID, TRANSACTION_COLLECTION_ID, ENDPOINT, PROJECT_ID, USER_COLLECTION_ID
 from database.transaction_dao import TransactionDao
@@ -32,7 +32,8 @@ async def validate_jwt(authorization: str = Depends(security)):
   return [userId, currency, databases]
 
 @router.post("/", status_code=200)
-async def forecast(requests: Union[TransactionsRequest_ing, TransactionsRequest_revolut, TransactionsRequest_shinha], user: list = Depends(validate_jwt)):
+async def forecast(requests: Union[TransactionsRequest_ing, TransactionsRequest_revolut, TransactionsRequest_shinha, TransactionsRequest_kb], user: list = Depends(validate_jwt)):
+  print("start")
   TransactionDao(user[2]).save(data=requests, user_data=user)
   return "OK"
 

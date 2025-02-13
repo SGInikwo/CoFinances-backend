@@ -1,5 +1,5 @@
-from pydantic import BaseModel, Field
-from typing import Optional, Union, List
+from pydantic import BaseModel, Field, ConfigDict
+from typing import Any, Dict, Optional, Union, List
 
 class Transactions_ing(BaseModel):
   date: int = Field(alias="Date")
@@ -36,6 +36,22 @@ class Transactions_shinha(BaseModel):
   balance: Optional[Union[str, int]] = Field(alias="__EMPTY_5", default=None)
   transaction_place: Optional[str] = Field(alias="__EMPTY_6", default=None)
 
+class Transactions_kb(BaseModel):
+  date_time: str = Field(alias="조회기간")
+  date_time: Optional[str] = Field(alias="조회기간", default=None)
+  recipient: Optional[str] = Field(alias="__EMPTY", default=None)
+  memo: Optional[str] = Field(alias="__EMPTY_1", default=None)
+  withdrawal: Optional[Union[str, int]] = Field(alias="__EMPTY_2", default=None)
+  deposit: Optional[Union[str, int]] = Field(alias="__EMPTY_3", default=None)
+  balance: Optional[Union[str, int]] = Field(alias="__EMPTY_4", default=None)
+  description: Optional[str] = Field(alias="__EMPTY_5", default=None)
+  transaction_place: Optional[str] = Field(alias="__EMPTY_6", default=None)
+
+  extra_fields: Dict[str, Any] = Field(default_factory=dict)
+
+  model_config = ConfigDict(extra="ignore")  
+
+
 
 class TransactionsRequest_ing(BaseModel):
   transactions: List[Transactions_ing]
@@ -47,4 +63,8 @@ class TransactionsRequest_revolut(BaseModel):
 
 class TransactionsRequest_shinha(BaseModel):
   transactions: List[Transactions_shinha]
+  clientCurrency: str
+
+class TransactionsRequest_kb(BaseModel):
+  transactions: List[Transactions_kb]
   clientCurrency: str
