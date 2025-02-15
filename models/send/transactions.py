@@ -62,9 +62,9 @@ def get_insert_data(requests: Union[List[Transactions_ing], List[Transactions_re
             "transactionDetails": request_dict["description"],
             "icon": 0,
             "userCurrency": int(user_data[1]),
-            "balance": balance_transform(request_dict["balance"], "Shinha"),
+            "balance": balance_transform(request_dict["balance"], "korean"),
             "originalAmount": amount_transform(request_dict["withdrawal"], request_dict["deposit"], "korean"),
-            "originalBalance": balance_transform(request_dict["balance"], "Shinha"),
+            "originalBalance": balance_transform(request_dict["balance"], "korean"),
             "originalCurrency": int(clientCurrency),
             "isSaving": 0,
             "isInvesting": 0
@@ -72,7 +72,6 @@ def get_insert_data(requests: Union[List[Transactions_ing], List[Transactions_re
           data.append(request_data)
     elif isinstance(request, Transactions_kb):
         if is_valid_date(request_dict["date_time"]):
-          print(request_dict["date_time"])
           request_data = {
             "id": secrets.token_hex(8),
             "userId": user_data[0],
@@ -80,13 +79,13 @@ def get_insert_data(requests: Union[List[Transactions_ing], List[Transactions_re
             "recipient": request_dict["recipient"],
             "currency": 1,
             "amount": amount_transform(request_dict["withdrawal"], request_dict["deposit"], "korean"),
-            "transactionType": request_dict["transaction_place"],
+            "transactionType": str(request_dict["transaction_place"]),
             "transactionDetails": request_dict["description"],
             "icon": 0,
             "userCurrency": int(user_data[1]),
-            "balance": balance_transform(request_dict["balance"], "Shinha"),
+            "balance": balance_transform(request_dict["balance"], "korean"),
             "originalAmount": amount_transform(request_dict["withdrawal"], request_dict["deposit"], "korean"),
-            "originalBalance": balance_transform(request_dict["balance"], "Shinha"),
+            "originalBalance": balance_transform(request_dict["balance"], "korean"),
             "originalCurrency": int(clientCurrency),
             "isSaving": 0,
             "isInvesting": 0,

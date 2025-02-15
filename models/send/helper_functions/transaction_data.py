@@ -8,7 +8,7 @@ from fastapi.encoders import jsonable_encoder
 
 from models.send.helper_functions.transactionSummary_data import get_conversion_rate
 import re
-from deep_translator import GoogleTranslator
+from deep_translator import GoogleTranslator, MyMemoryTranslator
 
 
 def is_not_korean(text):
@@ -17,9 +17,23 @@ def is_not_korean(text):
 
 def translate_text(text):
     if isinstance(text, str) and not text.isdigit():
-        # Use GoogleTranslator from deep_translator
-        return GoogleTranslator(source='ko', target='en').translate(text)
-    return text  # Keep numbers unchanged
+        if is_not_korean(text):
+          return text
+
+        return MyMemoryTranslator(source='korean', target='english').translate(text)
+    return text
+
+def unique_dicts(lst):
+    seen = set()
+    unique_list = []
+    
+    for d in lst:
+        key = tuple(sorted(d.items()))  # Sort to ensure consistent order
+        if key not in seen:
+            seen.add(key)
+            unique_list.append(d)
+
+    return unique_list
 
 def date_transform(date, type):
   if type == "Revolut":
@@ -73,8 +87,8 @@ def amount_transform(withdraw, deposit_or, bank):
 def balance_transform(balance, bank):
   if balance == None or balance == "" or balance == "None":
     return "0"
-  if bank == "Shinha":
-    return balance
+  if bank == "korean":
+    return str(balance)
   
   if bank == "Revolut":
     balance = float(balance)
@@ -129,6 +143,7 @@ def earliest_date_dataframe(transactions):
   df['date'] = pd.to_datetime(df['date'])
 
   month_day_list = df[['date']].apply(lambda x: {'month': x['date'].month, 'year': x['date'].year}, axis=1).tolist()
+  month_day_list = unique_dicts(month_day_list)
   return month_day_list
 
 
@@ -194,16 +209,10 @@ def past_analysis_dataframe(transactions, month, year):
     return jsonable_encoder({"last_5": latest_5_months, "top_3": top_expenses})
 
 def transalte_korean_english(transactions):
-  print(f'this is: {transactions[0]["transactionDetails"]}')
   if is_not_korean(transactions[0]["transactionDetails"]):
-    print("not korean")
     return transactions
   
   df = pd.DataFrame(transactions)
-  print(df)
-
   df_translated = df.map(translate_text)
-
-  print(df_translated)
 
   return df_translated.to_dict(orient='records')

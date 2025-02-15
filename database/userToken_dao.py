@@ -26,7 +26,6 @@ class UserTokenDao:
       rsul.pop("userId", None)
       rsul.pop('$permissions', None)
 
-    # print(result['documents'])
     return result['documents']
   
   def get_jwt(self, user_data):
@@ -36,13 +35,11 @@ class UserTokenDao:
             document_id=user_data
         )
     
-    # print(result)
     return result["jwt"]
   
   def save(self, user_data):
     data = get_insert_data(user_data=user_data)
 
-    # print(data)
     result = db.create_document(
           database_id= self.db_id,
           collection_id= self.collection_id,

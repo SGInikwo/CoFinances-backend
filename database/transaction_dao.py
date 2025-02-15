@@ -45,26 +45,30 @@ class TransactionDao:
             Query.order_desc("date"),  # Sort by "date" in descending order
         ]
     )
-    # Clean up sensitive fields
     for result in results["documents"]:
         result.pop("userId", None)
         result.pop("$permissions", None)
-    # Extract the latest date if no specific month and year are provided
+
     if not results["documents"]:
-        return []  # Return an empty list if no documents are found
+        return [] 
 
     latest_date = datetime.strptime(results["documents"][0]["date"], "%Y-%m-%d").strftime("%Y-%m")
-    # Determine the target month and year
+
+
     if month in [None, "null"] and year in [None, "null"]:
         target_date = latest_date
-    else:
+    elif not str(month).isdigit():
         try:
             month_number = datetime.strptime(month, "%B").month
             target_date = f"{year}-{month_number:02d}"
         except ValueError:
             raise ValueError(f"Invalid month: {month}. Please provide a valid full month name.")
+    else:
+        try:
+            target_date = f"{year}-{str(month).zfill(2)}"
+        except ValueError:
+            raise ValueError(f"Invalid month: {month}. Please provide a valid full month number.")
 
-    # Filter transactions based on the target date
     transactions_results = [
         result
         for result in results["documents"]
@@ -88,7 +92,6 @@ class TransactionDao:
       response = current_analysis(transactions)
     except:
        return None
-    # print(response)
     return response
   
 
@@ -98,25 +101,23 @@ class TransactionDao:
       response = past_analysis(transactions, month, year)
     except:
        return None
-
-    # print(response)
     return response
     
-  
 
   def update_currency(self, cleintCurrency, user_data):
     transactions = self.get_all_transactions()
-    responses = currency_response(transactions, cleintCurrency)
-    for response in responses:
-      response.pop("$databaseId", None)
-      response.pop("$collectionId", None)
+    if transactions:
+      responses = currency_response(transactions, cleintCurrency)
+      for response in responses:
+        response.pop("$databaseId", None)
+        response.pop("$collectionId", None)
 
-      self.db.update_document(
-          database_id= self.db_id,
-          collection_id= self.collection_id,
-          document_id= response["$id"],
-          data=response
-      )
+        self.db.update_document(
+            database_id= self.db_id,
+            collection_id= self.collection_id,
+            document_id= response["$id"],
+            data=response
+        )
     
   
   def update(self, transaction_id, data):
@@ -144,8 +145,11 @@ class TransactionDao:
                 Permission.delete(Role.user(user_data[0]))
               ]
           )
+    
+    self.update_currency(cleintCurrency=int(user_data[1]), user_data=user_data)
+
     for date in data[1]:
-      SummaryDao(user_data[2]).push_data(user_data=user_data[0], month=date["month"], year=date["year"], all=False)
+      SummaryDao(user_data[2]).push_data(user_data=user_data, month=date["month"], year=date["year"], all=False)
     return result
   
 
