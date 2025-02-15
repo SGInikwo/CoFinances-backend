@@ -17,8 +17,8 @@ router = APIRouter(
 security = HTTPBearer()
 
 async def validate_jwt(authorization: str = Depends(security)):
-  token = authorization.credentials  # Extract the token from the Authorization header
-  # print(token)
+  token = authorization.credentials
+  
   db = createSessionClient().set_jwt(token)
 
   databases = Databases(db)

@@ -55,7 +55,7 @@ def create_dataframe(transactions, uCurrency):
 
     # Drop temporary numeric columns and unwanted columns
     # df.drop(columns=['amount_num', 'balance_num', 'date_str'], inplace=True)
-    df["transactionId"] = df["id"]
+    df["transactionId"] = df["$id"]
     df["monthlyInvestment"] = ""
 
     df["date"] = pd.to_datetime(df["date"], format="%Y-%m-%d")  # Adjust format as needed
@@ -64,7 +64,7 @@ def create_dataframe(transactions, uCurrency):
     df["amount"] = df["amount"].astype(str)
 
     # Select the desired columns
-    df = df[['day', 'month', 'year', 'monthlyBalance', 'monthlyExpenses', 'monthlySavings', "monthlyInvestment", "transactionId", 'monthlyIncome', 'date', 'amount']]
+    df = df[['day', 'month', 'year', 'monthlyBalance', 'monthlyExpenses', 'monthlySavings', "monthlyInvestment", 'monthlyIncome', 'date', 'amount', "transactionId"]]
     return df
 
 
@@ -119,6 +119,15 @@ def summary_dataframe(transactions, month=None, year=None):
     return combined_summary
 
 def monthly_dataframe(summary):
+    # Map month names to numerical values
+    month_order = {month: index for index, month in enumerate([
+        'January', 'February', 'March', 'April', 'May', 'June', 
+        'July', 'August', 'September', 'October', 'November', 'December'
+    ], start=1)}
+
     df = pd.DataFrame.from_dict(summary)
-    df = df.groupby(["month", "year"]).agg({'monthlyExpenses': 'first'}).reset_index()
+    df = df.groupby(["month", "year"], as_index=False).agg({'monthlyExpenses': 'first'})
+    df['month_num'] = df['month'].map(month_order)
+
+    df = df.sort_values(by=['year', 'month_num'], ascending=[False, False]).drop(columns=['month_num'])
     return df[["month", "year"]].to_dict(orient='records')

@@ -17,7 +17,7 @@ security = HTTPBearer()
 
 async def validate_jwt(authorization: str = Depends(security)):
   token = authorization.credentials  # Extract the token from the Authorization header
-  # print(token)
+
   db = createSessionClient().set_jwt(token)
 
   databases = Databases(db)
@@ -60,7 +60,6 @@ async def forecast(month, year, user: list = Depends(validate_jwt)):
 
 @router.get("/months", status_code=200)
 async def forecast(user: list = Depends(validate_jwt)):
-  
   try:
     months = SummaryDao(user[2]).get_months(user)
   except:

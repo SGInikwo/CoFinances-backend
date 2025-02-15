@@ -43,41 +43,46 @@ class SummaryDao:
   def push_data(self, user_data, month=None, year=None, all=False):
     from database.transaction_dao import TransactionDao
 
-    if all==False:
+    if all==True:
       transactions = TransactionDao(user_data[2]).get_transactions(user_data=user_data[0])
     else:
       transactions = TransactionDao(user_data[2]).get_transactions(user_data=user_data[0], month=month, year=year)
 
-    data = get_insert_data(transactions, user_data[1])
-    exist_summary = self.get_summary()
+    if transactions:
+      data = get_insert_data(transactions, user_data[1])
 
-    for row in data:
+      exist_summary = self.get_summary()
+
       if exist_summary:
-        results = [(entry['date'], entry['transactionId'], entry['$id']) for entry in exist_summary]
-
-        for result in results:
-          if result[0] == row["date"] and result[1] == row["transactionId"]:
-            self.db.update_document(
-                database_id= self.db_id,
-                collection_id= self.collection_id,
-                document_id= result[2],
-                data=row,
-                permissions=[
-                    Permission.read(Role.user(user_data[0])),
-                    Permission.update(Role.user(user_data[0])),
-                    Permission.delete(Role.user(user_data[0]))
-                ]
-            )
+        results = [(entry['date'], entry['transactionId']["$id"], entry['$id']) for entry in exist_summary]
+        list_dates, list_transId, list_ids = zip(*results) if results else ([], [], [])
       else:
-        self.db.create_document(
-          database_id= self.db_id,
-          collection_id= self.collection_id,
-          document_id=secrets.token_hex(8),
-          data=row,
-          permissions=[
-              Permission.read(Role.user(user_data[0])),
-              Permission.update(Role.user(user_data[0])),
-              Permission.delete(Role.user(user_data[0]))
-          ]
-        )
+        results = None
+      for row in data:
+        if results != None and row["date"] in list_dates and row["transactionId"] in list_transId:
+          for result in results:
+            if result[0] == row["date"] and result[1] == row["transactionId"]:
+              self.db.update_document(
+                  database_id= self.db_id,
+                  collection_id= self.collection_id,
+                  document_id= result[2],
+                  data=row,
+                  permissions=[
+                      Permission.read(Role.user(user_data[0])),
+                      Permission.update(Role.user(user_data[0])),
+                      Permission.delete(Role.user(user_data[0]))
+                  ]
+              )
+        else:
+          self.db.create_document(
+            database_id= self.db_id,
+            collection_id= self.collection_id,
+            document_id=secrets.token_hex(8),
+            data=row,
+            permissions=[
+                Permission.read(Role.user(user_data[0])),
+                Permission.update(Role.user(user_data[0])),
+                Permission.delete(Role.user(user_data[0]))
+            ]
+          )
     return "OK"

@@ -3,7 +3,7 @@ from typing import Union, List, Dict
 from models.send.transactions import TransactionResponse
 from models.receive.transactions import Transactions_ing, Transactions_revolut, Transactions_shinha, TransactionsRequest_ing, TransactionsRequest_kb, TransactionsRequest_revolut, TransactionsRequest_shinha
 import httpx
-from database.deps import createSessionClient, DATABASE_ID, TRANSACTION_COLLECTION_ID, ENDPOINT, PROJECT_ID, USER_COLLECTION_ID
+from database.deps import createAdminClient, createSessionClient, DATABASE_ID, TRANSACTION_COLLECTION_ID, ENDPOINT, PROJECT_ID, USER_COLLECTION_ID
 from database.transaction_dao import TransactionDao
 from fastapi.security import HTTPBearer
 from appwrite.services.databases import Databases
@@ -18,22 +18,23 @@ security = HTTPBearer()
 async def validate_jwt(authorization: str = Depends(security)):
   token = authorization.credentials  # Extract the token from the Authorization header
 
-  db = createSessionClient().set_jwt(token)
+  userClient = createSessionClient().set_jwt(token)
+  adminClient = createAdminClient()
 
-  databases = Databases(db)
+  userDB = Databases(userClient)
+  adminDB = Databases(adminClient)
 
-  documents = databases.list_documents(
+  documents = userDB.list_documents(
     database_id=DATABASE_ID,
     collection_id=USER_COLLECTION_ID
   )
 
   userId = documents["documents"][0]["userId"]
   currency = documents["documents"][0]["currency"]
-  return [userId, currency, databases]
+  return [userId, currency, userDB, adminDB]
 
 @router.post("/", status_code=200)
 async def forecast(requests: Union[TransactionsRequest_ing, TransactionsRequest_revolut, TransactionsRequest_shinha, TransactionsRequest_kb], user: list = Depends(validate_jwt)):
-  print("start")
   TransactionDao(user[2]).save(data=requests, user_data=user)
   return "OK"
 
