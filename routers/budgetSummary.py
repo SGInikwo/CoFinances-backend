@@ -4,14 +4,13 @@ from models.send.transactions import TransactionResponse
 from models.receive.transactions import Transactions_ing, Transactions_revolut, Transactions_shinha
 import httpx
 from database.deps import createSessionClient, DATABASE_ID, TRANSACTION_COLLECTION_ID, ENDPOINT, PROJECT_ID, USER_COLLECTION_ID
-from database.userToken_dao import UserTokenDao
+from database.budgetSummary_dao import BudgetSummaryDao
 from fastapi.security import HTTPBearer
 from appwrite.services.databases import Databases
 
-
 router = APIRouter(
-  prefix="/usertoken",
-  tags=["usertoken"]
+  prefix="/budgetSummary",
+  tags=["budgetSummary"]
 )
 
 security = HTTPBearer()
@@ -29,34 +28,25 @@ async def validate_jwt(authorization: str = Depends(security)):
   )
 
   userId = documents["documents"][0]["userId"]
-  # currency = documents["documents"][0]["currency"]
-  return [userId, token]
+  currency = documents["documents"][0]["currency"]
+  return [userId, currency, databases]
 
-@router.post("/")
+
+@router.post("/", status_code=200)
 async def forecast(user: list = Depends(validate_jwt)):
   
-  response = UserTokenDao().save(user_data=user)
+  BudgetSummaryDao(user[2]).push_data(user_data=user)
 
-  return response
+  return "OK"
 
-@router.post("/updateauth/")
+@router.get("/list", status_code=200)
 async def forecast(user: list = Depends(validate_jwt)):
   
-  response = UserTokenDao().update(user_data=user)
+  all_summaries = BudgetSummaryDao(user[2]).get_summary()
 
-  return response
+  return all_summaries
 
-@router.delete("/delete/{user_id}")
-async def forecast(user_id: str, user: list = Depends(validate_jwt)):
-  
-  response = UserTokenDao().delete(user_data=user_id)
-
-  return response
-
-@router.get("/get/{user_id}")
-async def forecast(user_id: str):
-  try:
-    response = UserTokenDao().get_jwt(user_data=user_id)
-    return response
-  except:
-    return False
+@router.post("/update_balances-{clientCurrency}", status_code=200)
+async def forecast(clientCurrency, user: list = Depends(validate_jwt)):
+  BudgetSummaryDao(user[2]).update_currency(cleintCurrency=int(clientCurrency), user_data=user)
+  return "OK"
