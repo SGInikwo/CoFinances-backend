@@ -50,7 +50,9 @@ class Transactions_kb(BaseModel):
 
   model_config = ConfigDict(extra="ignore")  
 
-
+class TransactionsUpdate(BaseModel):
+  id: str
+  categoryId: str
 
 class TransactionsRequest_ing(BaseModel):
   transactions: List[Transactions_ing]
@@ -67,3 +69,6 @@ class TransactionsRequest_shinha(BaseModel):
 class TransactionsRequest_kb(BaseModel):
   transactions: List[Transactions_kb]
   clientCurrency: str
+
+class TransactionsUpdateRequest(BaseModel):
+  update: List[TransactionsUpdate]

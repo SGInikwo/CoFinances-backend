@@ -5,7 +5,9 @@ import secrets
 
 from models.send.helper_functions.transaction_data import amount_transform, balance_transform, currency_update_dataframe, current_analysis_dataframe, date_transform, earliest_date_dataframe, get_currency, is_valid_date, past_analysis_dataframe, transalte_korean_english
 
-def get_insert_data(requests: Union[List[Transactions_ing], List[Transactions_revolut], List[Transactions_shinha], List[Transactions_kb]], clientCurrency, user_data):
+def get_insert_data(requests: Union[List[Transactions_ing], List[Transactions_revolut], List[Transactions_shinha], List[Transactions_kb]], clientCurrency, user_data, category):
+  general_id = next((cat["$id"] for cat in category if cat["name"].lower() == "general"), None)
+
   data = []
   for request in requests:
     request_dict = dict(request)
@@ -19,14 +21,14 @@ def get_insert_data(requests: Union[List[Transactions_ing], List[Transactions_re
            "amount": amount_transform(request_dict["amount"], request_dict["debit_credit"], "Ing"),
            "transactionType": request_dict["transaction_type"],
            "transactionDetails": request_dict["notification"],
-           "icon": 0,
            "userCurrency": int(user_data[1]),
            "balance": balance_transform(request_dict["balance"], "Ing"),
            "originalAmount": amount_transform(request_dict["amount"], request_dict["debit_credit"], "Ing"),
            "originalBalance": balance_transform(request_dict["balance"], "Ing"),
            "originalCurrency": int(clientCurrency),
            "isSaving": 0,
-           "isInvesting": 0
+           "isInvesting": 0,
+           "categoryId": general_id
         }
         data.append(request_data)
     elif isinstance(request, Transactions_revolut):
@@ -39,14 +41,14 @@ def get_insert_data(requests: Union[List[Transactions_ing], List[Transactions_re
            "amount": amount_transform(request_dict["amount"], "None", "Revolut"),
            "transactionType": request_dict["type"],
            "transactionDetails": request_dict["description"],
-           "icon": 0,
            "userCurrency": int(user_data[1]),
            "balance": balance_transform(request_dict["balance"], "Revolut"),
            "originalAmount": amount_transform(request_dict["amount"], "None", "Revolut"),
            "originalBalance": balance_transform(request_dict["balance"], "Revolut"),
            "originalCurrency": int(clientCurrency),
            "isSaving": 0,
-           "isInvesting": 0
+           "isInvesting": 0,
+           "categoryId": general_id
         }
         data.append(request_data)
     elif isinstance(request, Transactions_shinha):
@@ -60,14 +62,14 @@ def get_insert_data(requests: Union[List[Transactions_ing], List[Transactions_re
             "amount": amount_transform(request_dict["withdrawal"], request_dict["deposit"], "korean"),
             "transactionType": request_dict["transaction_place"],
             "transactionDetails": request_dict["description"],
-            "icon": 0,
             "userCurrency": int(user_data[1]),
             "balance": balance_transform(request_dict["balance"], "korean"),
             "originalAmount": amount_transform(request_dict["withdrawal"], request_dict["deposit"], "korean"),
             "originalBalance": balance_transform(request_dict["balance"], "korean"),
             "originalCurrency": int(clientCurrency),
             "isSaving": 0,
-            "isInvesting": 0
+            "isInvesting": 0,
+            "categoryId": general_id
           }
           data.append(request_data)
     elif isinstance(request, Transactions_kb):
@@ -81,7 +83,6 @@ def get_insert_data(requests: Union[List[Transactions_ing], List[Transactions_re
             "amount": amount_transform(request_dict["withdrawal"], request_dict["deposit"], "korean"),
             "transactionType": str(request_dict["transaction_place"]),
             "transactionDetails": request_dict["description"],
-            "icon": 0,
             "userCurrency": int(user_data[1]),
             "balance": balance_transform(request_dict["balance"], "korean"),
             "originalAmount": amount_transform(request_dict["withdrawal"], request_dict["deposit"], "korean"),
@@ -89,6 +90,7 @@ def get_insert_data(requests: Union[List[Transactions_ing], List[Transactions_re
             "originalCurrency": int(clientCurrency),
             "isSaving": 0,
             "isInvesting": 0,
+            "categoryId": general_id
           }
           data.append(request_data)
     else:
@@ -110,7 +112,17 @@ def past_analysis(transactions, month, year):
    response = past_analysis_dataframe(transactions, month, year)
    return response
 
+def update_category(response):
+  data = []
+  for request in response:
+    request_dict = dict(request)
+    request_data = {
+        "id": request_dict["id"],
+        "categoryId": request_dict["categoryId"],
 
+    }
+    data.append(request_data)
+  return data
 
 class Transactions(BaseModel):
   id: str

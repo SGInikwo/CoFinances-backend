@@ -30,9 +30,9 @@ def create_dataframe(transactions, uCurrency):
     # Calculate monthlyBalance, monthlyExpenses, monthlySavings, and monthlyIncome
     df['monthlyBalance'] = (
     df.sort_values('date', ascending=True)
-    .groupby(['year', 'month'])['balance_num']
-    .transform('last')
-    .astype(str)
+        .groupby(['year', 'month'])['balance_num']
+        .transform('last')
+        .astype(str)
     )
 
     df['monthlyExpenses'] = (
