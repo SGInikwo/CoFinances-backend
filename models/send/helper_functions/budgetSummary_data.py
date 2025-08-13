@@ -31,7 +31,7 @@ def currency_update_dataframe(budgets, cleintCurrency):
 
 def create_dataframe(budgets, category, uCurrency):
     df = pd.DataFrame.from_dict(budgets)
-    category_dict = dict(category)
+    # category_dict = dict(category)
 
     # Convert 'amount' and 'balance' temporarily for calculations
     df[['budget_num', 'actual_num']] = df[['budget', 'actual']].apply(pd.to_numeric, errors='coerce')
@@ -51,8 +51,9 @@ def create_dataframe(budgets, category, uCurrency):
     )
 
     # Drop temporary numeric columns and unwanted columns
-    print(f"Category dict: {category_dict}")
-    df["categoryId"] = df["category"].map(category_dict)
+    # print(f"Category dict: {category_dict}")
+    # df["categoryId"] = df["category"].map(category_dict)
+    df["budgetId"] = df["$id"]
     df["categoryName"] = df["category"]
 
     df['currency'] = uCurrency
@@ -62,5 +63,5 @@ def create_dataframe(budgets, category, uCurrency):
     # df["amount"] = df["amount"].astype(str)
 
     # Select the desired columns
-    df = df[['categoryName', 'budgetCategory', 'actualCategory', 'categoryId', 'date']]
+    df = df[['categoryName', 'budgetCategory', 'actualCategory', 'date', 'budgetId']]
     return df

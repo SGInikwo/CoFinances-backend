@@ -88,7 +88,7 @@ class BudgetDAO:
 
         if not str(month).isdigit():
             try:
-                month_number = datetime.strptime(month, "%B").month
+                month_number = datetime.strptime(str(month), "%B").month
                 target_date = f"{year}-{month_number:02d}"
             except ValueError:
                 raise ValueError(f"Invalid month name: {month}. Please provide full month name.")

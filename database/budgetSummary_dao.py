@@ -77,12 +77,12 @@ class BudgetSummaryDao:
       exist_summary = self.get_summary()
 
       if exist_summary:
-        results = [(entry['date'], entry['categoryId']["$id"], entry['$id']) for entry in exist_summary]
-        list_dates, list_transId, list_ids = zip(*results) if results else ([], [], [])
+        results = [(entry['date'], entry['budgetId']["$id"], entry['$id']) for entry in exist_summary]
+        list_dates, list_budgetsId, list_ids = zip(*results) if results else ([], [], [])
       else:
         results = None
       for row in data:
-        if results != None and row["date"] in list_dates and row["categoryId"] in list_transId:
+        if results != None and row["date"] in list_dates and row["budgetId"] in list_budgetsId:
           for result in results:
             if result[0] == row["date"] and result[1] == row["categoryId"]:
               self.db.update_document(
