@@ -24,7 +24,7 @@ class GoalsDao:
         result = self.db.list_documents(
             database_id=self.db_id,
             collection_id=self.collection_id,
-            queries=[Query.order_desc("date"), Query.limit(limit), Query.offset(offset)],
+            queries=[Query.order_asc("date"), Query.limit(limit), Query.offset(offset)],
         )
         docs = result["documents"]
         for doc in docs:
