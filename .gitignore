@@ -50,3 +50,4 @@ __blobstorage__/
 
 # Folders to ignonre
 test_file/
+database_setup/collections/
